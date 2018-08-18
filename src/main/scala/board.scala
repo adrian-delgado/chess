@@ -9,6 +9,13 @@ object Board {
 	import colour._
 	import pieces._
 
+	implicit def posOps(pos: Pos) = new {
+		def + (otherPos: Pos) = (pos._1 + otherPos._1, pos._2 + otherPos._2)
+		def * (otherPos: Pos) = (pos._1 * otherPos._1, pos._2 * otherPos._2)
+		def * (n: Int) = (pos._1 * n, pos._2 * n)
+		def inBoard = (0 <= pos._1 && pos._1 < 8) && (0 <= pos._2 && pos._2 < 8)
+	}
+
 	def empty = {
 		val row = Vector.fill(rowSize)(None)
 		val rows = Vector.fill(rowSize)(row)
@@ -47,23 +54,97 @@ object Board {
 	}
 }
 
-class Board[T](rows: Vector[Vector[T]]) {
-	def get(pos: Board.Pos) = {
+class Board[T](rows: Vector[Vector[Option[T]]]) {
+	import Board.{ Pos, posOps, rowSize }
+	import pieces._
+
+	def get(pos: Pos) = {
 		val (rowIndex, columnIndex) = pos
 		rows(rowIndex)(columnIndex)
 	}
 
-	def updated(pos: Board.Pos, elem: T): Board[T] = {
+	def makeMove(from: Pos, to: Pos) = {
+		val piece = get(from)
+		updated(List((from, None), (to, piece)))
+	}
+
+	def legalMoves(pos: Pos) = {
+		val pieceOption = get(pos)
+		pieceOption match {
+			case None => Nil
+			case Some(piece: Piece) => piece match {
+				case King(_) => {
+					val directions = List((-1, -1), (-1, 0), (-1, 1),
+								   		   (0, -1),			  (0, 1),
+								   		   (1, -1),  (1, 0),  (1, 1))
+					directions.map(_ + pos).filter(_.inBoard)
+					for (
+						direction <- directions;
+						newPos = direction + pos if newPos.inBoard
+					) yield newPos
+				}
+				case Queen(_) => {
+					val directions = List((-1, -1), (-1, 0), (-1, 1),
+										   (0, -1),			  (0, 1),
+										   (1, -1),  (1, 0),  (1, 1))
+					def distanceStream = (1 to rowSize).iterator
+
+					for (
+						direction <- directions;
+						distance <- distanceStream.takeWhile(dist => {
+							val currentPos = direction * dist + pos
+							if (currentPos.inBoard) get(currentPos) match {
+								case None => true
+								case Some(otherPiece: Piece) =>
+									if (piece.isWhite == otherPiece.isWhite) false
+									else {
+										val prevPos = direction * (dist - 1) + pos
+										get(prevPos) match {
+											case None => true
+											case Some(_) => false
+										}
+									}
+							}
+							else false
+						})
+					) yield direction * distance + pos
+
+					/*directions.flatMap(direction => {
+						val distances = distanceStream.takeWhile(distance => {
+							val currentPos = direction * distance + pos
+							if (currentPos.inBoard) get(currentPos) match {
+								case None => true
+								case Some(otherPiece: Piece) =>
+									if (piece.isWhite == otherPiece.isWhite) false
+									else {
+										val prevPos = direction * (distance - 1) + pos
+										get(prevPos) match {
+											case None => true
+											case Some(_) => false
+										}
+									}
+							}
+							else false
+						})
+						distances.map(distance => direction * distance + pos).toList
+					})*/
+				}
+				case _ => Nil
+			}
+		}
+	}
+
+	def updated(pos: Pos, elem: Option[T]) = {
 		val (rowIndex, columnIndex) = pos
 		val updatedRow = rows(rowIndex).updated(columnIndex, elem)
 		val newRows = rows.updated(rowIndex, updatedRow)
 		new Board(newRows)
 	}
 
-	def updated(updates: List[(Board.Pos, T)]) = {
+	def updated(updates: List[(Pos, Option[T])]) = {
 		val newRows = updates.foldRight(rows) {
-			case (curr, acc) => {
-				val ((rowIndex, columnIndex), elem) = curr
+			case (pos, acc) => {
+				val ((rowIndex, columnIndex), elem) = pos
 				val updatedRow = acc(rowIndex).updated(columnIndex, elem)
 				acc.updated(rowIndex, updatedRow)
 			}
@@ -75,7 +156,7 @@ class Board[T](rows: Vector[Vector[T]]) {
 		rows.map {
 			row => row.map {
 				case Some(piece) => piece.toString
-				case _ => " "
+				case None => " "
 			}.mkString
 		}.reverse.mkString("\n")
 	}

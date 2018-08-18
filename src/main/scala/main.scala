@@ -14,7 +14,7 @@ object Main extends App {
 	val updates = List(((0, 0), 100), ((1, 1), 101), ((2,2), 102))
 
 	// val out = b.updated(updates)
-	val out = Board.empty.get((0,0))
+	val out = Board.initialBoard.get(1, 4)
 
 	println(out)
 }

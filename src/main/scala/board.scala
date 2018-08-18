@@ -6,10 +6,44 @@ object Board {
 	
 	type Pos = (Int, Int)
 
+	import colour._
+	import pieces._
+
 	def empty = {
-		val emptyRow = Vector.fill(rowSize)(0)
-		val emptyRows = Vector.fill(rowSize)(emptyRow)
-		new Board(emptyRows)
+		val row = Vector.fill(rowSize)(None)
+		val rows = Vector.fill(rowSize)(row)
+		new Board(rows)
+	}
+
+	def initialBoard = {
+		def initialPieces(colour: Colour) = Vector(
+			Some(Rook(colour)),
+			Some(Knight(colour)),
+			Some(Bishop(colour)),
+			Some(Queen(colour)),
+			Some(King(colour)),
+			Some(Bishop(colour)),
+			Some(Knight(colour)),
+			Some(Rook(colour))
+		)
+
+		val whitePieces = initialPieces(WHITE)
+		val whitePawns = Vector.fill(rowSize)(Some(Pawn(WHITE)))
+		val emptyRow = Vector.fill(rowSize)(None)
+		val blackPawns = Vector.fill(rowSize)(Some(Pawn(BLACK)))
+		val blackPieces = initialPieces(BLACK)
+
+		val rows = Vector(
+			whitePieces,
+			whitePawns,
+			emptyRow,
+			emptyRow,
+			emptyRow,
+			emptyRow,
+			blackPawns,
+			blackPieces
+		)
+		new Board(rows)
 	}
 }
 
@@ -37,5 +71,12 @@ class Board[T](rows: Vector[Vector[T]]) {
 		new Board(newRows)
 	}
 
-	override def toString = rows.toString
+	override def toString = {
+		rows.map {
+			row => row.map {
+				case Some(piece) => piece.toString
+				case _ => " "
+			}.mkString
+		}.reverse.mkString("\n")
+	}
 }

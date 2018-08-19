@@ -1,5 +1,10 @@
 package colour {
-	abstract class Colour
+	abstract class Colour {
+		def other = this match {
+			case WHITE => BLACK
+			case BLACK => WHITE
+		}
+	}
 	object WHITE extends Colour
 	object BLACK extends Colour
 }

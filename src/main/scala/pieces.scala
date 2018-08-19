@@ -12,14 +12,6 @@ package pieces {
 		val colour: Colour
 		val directions: List[Pos]
 		val distanceLimit: Int
-		override def toString = this match {
-			case King(colour) => if(colour == WHITE) "K" else "k"
-			case Queen(colour) => if(colour == WHITE) "Q" else "q"
-			case Rook(colour) => if(colour == WHITE) "R" else "r"
-			case Bishop(colour) => if(colour == WHITE) "B" else "b"
-			case Knight(colour) => if(colour == WHITE) "N" else "n"
-			case Pawn(colour) => if(colour == WHITE) "P" else "p"
-		}
 	}
 
 	case class King(colour: Colour) extends Piece {
@@ -29,6 +21,7 @@ package pieces {
 			 (0, -1), /*     */ (0, 1),
 			 (1, -1),  (1, 0),  (1, 1)
 		)
+		override def toString = if(colour == WHITE) "K" else "k"
 	}
 	case class Queen(colour: Colour) extends Piece {
 		val distanceLimit = 7
@@ -37,6 +30,7 @@ package pieces {
 			 (0, -1), /*     */ (0, 1),
 			 (1, -1),  (1, 0),  (1, 1)
 		)
+		override def toString = if(colour == WHITE) "Q" else "q"
 	}
 	case class Rook(colour: Colour) extends Piece {
 		val distanceLimit = 7
@@ -45,14 +39,17 @@ package pieces {
 			(0, -1), /*    */ (0, 1),
 			/*    */ (1, 0), /*    */
 		)
+		override def toString = if(colour == WHITE) "R" else "r"
 	}
+
 	case class Bishop(colour: Colour) extends Piece {
 		val distanceLimit = 7
 		val directions = List(
 			(-1, -1), /*    */ (-1, 1),
 			/*     */ /*    */ /*    */
 			 (1, -1), /*    */  (1, 1)
-		)			
+		)
+		override def toString = if(colour == WHITE) "B" else "b"
 	}
 	case class Knight(colour: Colour) extends Piece {
 		val distanceLimit = 1
@@ -60,10 +57,12 @@ package pieces {
 			(1, 2), (2, 1), (2, -1), (1, -2),
 			(-1, -2), (-2, -1), (-2, 1), (-1, 2)
 		)
+		override def toString = if(colour == WHITE) "N" else "n"
 	}
 	case class Pawn(colour: Colour) extends Piece {
 		val distanceLimit = 1
 		val directions = if (colour == WHITE) List((1, -1), (1, 0), (1, 1), (2, 0))
 						 else List((-1, -1), (-1, 0), (-1, 1), (-2, 0))
+		override def toString = if(colour == WHITE) "P" else "p"
 	}
 }

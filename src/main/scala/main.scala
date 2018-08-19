@@ -1,7 +1,7 @@
 package main
 
 object Main extends App {
-	import board.Board
+	import board.{ Pos, Board, posToString, stringToPos }
 
 
 	val row = Vector(Some(1),Some(2),Some(3))
@@ -17,10 +17,16 @@ object Main extends App {
 
 	val b = Board.initialBoard
 	// println(b)
-	val out = b.makeMove((0,3), (2,3))
+	val p = b.makeMove((0,3), (2,3))
 
+	println(p)
+
+	val pos: Pos = if (args.size > 0) args(0).toUpperCase else "E1"
+
+	println(pos)
+
+	val out = p.possibleMoves(pos).map(posToString)
+
+	// println(out.possibleMoves(2,3))
 	println(out)
-
-	// println(out.legalMoves(2,3))
-	println(out.legalMoves(0,4))
 }

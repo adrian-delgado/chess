@@ -56,69 +56,31 @@ class Board[T](rows: Vector[Vector[Option[T]]]) {
 		updated(List((from, None), (to, piece)))
 	}
 
-	def legalMoves(pos: Pos) = {
-		val pieceOption = get(pos)
-		pieceOption match {
-			case None => Nil
-			case Some(piece: Piece) => piece match {
-				case King(_) => {
-					val directions = List((-1, -1), (-1, 0), (-1, 1),
-								   		   (0, -1),			  (0, 1),
-								   		   (1, -1),  (1, 0),  (1, 1))
-					directions.map(_ + pos).filter(_.inBoard)
-					for (
-						direction <- directions;
-						newPos = direction + pos if newPos.inBoard
-					) yield newPos
-				}
-				case Queen(_) => {
-					val directions = List((-1, -1), (-1, 0), (-1, 1),
-										   (0, -1),			  (0, 1),
-										   (1, -1),  (1, 0),  (1, 1))
-					def distanceStream = (1 to rowSize).iterator
-
-					for (
-						direction <- directions;
-						distance <- distanceStream.takeWhile(dist => {
-							val currentPos = direction * dist + pos
-							if (currentPos.inBoard) get(currentPos) match {
+	def possibleMoves(pos: Pos) = get(pos) match {
+		case None => Nil
+		case Some(piece: Piece) => {
+			def distanceStream = (1 to piece.distanceLimit).iterator
+			def validator(direction: Pos)(dist: Int) = {
+				val currentPos = direction * dist + pos
+				if (currentPos.inBoard) get(currentPos) match {
+					case None => true
+					case Some(otherPiece: Piece) =>
+						if (piece.colour == otherPiece.colour) false
+						else {
+							val prevPos = direction * (dist - 1) + pos
+							get(prevPos) match {
 								case None => true
-								case Some(otherPiece: Piece) =>
-									if (piece.colour == otherPiece.colour) false
-									else {
-										val prevPos = direction * (dist - 1) + pos
-										get(prevPos) match {
-											case None => true
-											case Some(_) => false
-										}
-									}
+								case Some(_) => false
 							}
-							else false
-						})
-					) yield direction * distance + pos
-
-					/*directions.flatMap(direction => {
-						val distances = distanceStream.takeWhile(distance => {
-							val currentPos = direction * distance + pos
-							if (currentPos.inBoard) get(currentPos) match {
-								case None => true
-								case Some(otherPiece: Piece) =>
-									if (piece.isWhite == otherPiece.isWhite) false
-									else {
-										val prevPos = direction * (distance - 1) + pos
-										get(prevPos) match {
-											case None => true
-											case Some(_) => false
-										}
-									}
-							}
-							else false
-						})
-						distances.map(distance => direction * distance + pos).toList
-					})*/
+						}
 				}
-				case _ => Nil
+				else false
 			}
+
+			for (
+				direction <- piece.directions;
+				distance <- distanceStream.takeWhile(validator(direction))
+			) yield direction * distance + pos
 		}
 	}
 

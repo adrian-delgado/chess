@@ -4,8 +4,20 @@ package colour {
 	object BLACK extends Colour
 }
 
+package object directions {
+	val NW = (1, -1)
+	val N = (1, 0)
+	val NE = (1, 1)
+	val W = (0, -1)
+	val E = (0, 1)
+	val SW = (-1, -1)
+	val S = (-1, 0)
+	val SE = (-1, 1)
+}
+
 package pieces {
 	import colour._
+	import directions._
 	import board.Pos
 
 	abstract class Piece {
@@ -17,27 +29,27 @@ package pieces {
 	case class King(colour: Colour) extends Piece {
 		val distanceLimit = 1
 		val directions = List(
-			(-1, -1), (-1, 0), (-1, 1),
-			 (0, -1), /*     */ (0, 1),
-			 (1, -1),  (1, 0),  (1, 1)
+			NW, N, NE,
+			W,      E,
+			SW, S, SE
 		)
 		override def toString = if(colour == WHITE) "K" else "k"
 	}
 	case class Queen(colour: Colour) extends Piece {
 		val distanceLimit = 7
 		val directions = List(
-			(-1, -1), (-1, 0), (-1, 1),
-			 (0, -1), /*     */ (0, 1),
-			 (1, -1),  (1, 0),  (1, 1)
+			NW, N, NE,
+			W,      E,
+			SW, S, SE
 		)
 		override def toString = if(colour == WHITE) "Q" else "q"
 	}
 	case class Rook(colour: Colour) extends Piece {
 		val distanceLimit = 7
 		val directions = List(
-			/*   */ (-1, 0), /*   */
-			(0, -1), /*    */ (0, 1),
-			/*    */ (1, 0), /*    */
+				N,   
+			W,      E,
+				S
 		)
 		override def toString = if(colour == WHITE) "R" else "r"
 	}
@@ -45,9 +57,9 @@ package pieces {
 	case class Bishop(colour: Colour) extends Piece {
 		val distanceLimit = 7
 		val directions = List(
-			(-1, -1), /*    */ (-1, 1),
-			/*     */ /*    */ /*    */
-			 (1, -1), /*    */  (1, 1)
+			NW,		NE,
+
+			SW,		SE
 		)
 		override def toString = if(colour == WHITE) "B" else "b"
 	}

@@ -2,6 +2,7 @@ package main
 
 object Main extends App {
 	import board.{ Pos, Board, posToString, stringToPos }
+	import game.Game
 
 
 	val row = Vector(Some(1),Some(2),Some(3))
@@ -29,4 +30,10 @@ object Main extends App {
 
 	// println(out.possibleMoves(2,3))
 	println(out)
+
+	println("-------------------")
+
+	val g = Game.init
+	println(g)
+	g.play("e2", "e4").play("e7", "e5")/*.play("e4", "e5")*/
 }

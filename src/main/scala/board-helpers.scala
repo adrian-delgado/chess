@@ -8,5 +8,16 @@ package object board {
 		def inBoard = (0 <= pos._1 && pos._1 < 8) && (0 <= pos._2 && pos._2 < 8)
 	}
 
+	def posToString(pos: Pos) = {
+		val (row, col) = pos
+		s"${(col + 65).toChar}${row + 1}"
+	}
+
+	implicit def stringToPos(s: String) = {
+		val col = s(0).toInt - 65
+		val row = s(1).asDigit - 1
+		(row, col)
+	}
+
 	val rowSize = 8
 }

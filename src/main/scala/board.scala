@@ -1,9 +1,10 @@
 package board
 
+import pieces.Piece
 
 object Board {
 	import colour._
-	import pieces._
+	import pieces.{ Piece => _, _ }
 
 	def empty = {
 		val row = Vector.fill(rowSize)(None)
@@ -43,9 +44,7 @@ object Board {
 	}
 }
 
-class Board[T](rows: Vector[Vector[Option[T]]]) {
-	import pieces._
-
+class Board(rows: Vector[Vector[Option[Piece]]]) {
 	def get(pos: Pos) = {
 		val (rowIndex, columnIndex) = pos
 		rows(rowIndex)(columnIndex)
@@ -84,14 +83,14 @@ class Board[T](rows: Vector[Vector[Option[T]]]) {
 		}
 	}
 
-	def updated(pos: Pos, elem: Option[T]) = {
+	def updated(pos: Pos, elem: Option[Piece]) = {
 		val (rowIndex, columnIndex) = pos
 		val updatedRow = rows(rowIndex).updated(columnIndex, elem)
 		val newRows = rows.updated(rowIndex, updatedRow)
 		new Board(newRows)
 	}
 
-	def updated(updates: List[(Pos, Option[T])]) = {
+	def updated(updates: List[(Pos, Option[Piece])]) = {
 		val newRows = updates.foldRight(rows) {
 			case (pos, acc) => {
 				val ((rowIndex, columnIndex), elem) = pos

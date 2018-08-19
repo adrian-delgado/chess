@@ -1,6 +1,6 @@
 package object board {
 	type Pos = (Int, Int)
-	
+
 	implicit def posOps(pos: Pos) = new {
 		def + (otherPos: Pos) = (pos._1 + otherPos._1, pos._2 + otherPos._2)
 		def * (otherPos: Pos) = (pos._1 * otherPos._1, pos._2 * otherPos._2)
@@ -14,8 +14,9 @@ package object board {
 	}
 
 	implicit def stringToPos(s: String) = {
-		val col = s(0).toInt - 65
-		val row = s(1).asDigit - 1
+		val upperCase = s.toUpperCase
+		val col = upperCase(0).toInt - 65
+		val row = upperCase(1).asDigit - 1
 		(row, col)
 	}
 
